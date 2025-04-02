@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1小時圖書館鎖定 | 暫停螢幕power，拎返你個hour</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #818cf8;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --card-bg: #f3f4f6;
+            --accent-color: #4f46e5;
+            --shadow-color: rgba(99, 102, 241, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #818cf8;
+            --secondary-color: #6366f1;
+            --text-color: #f3f4f6;
+            --bg-color: #1f2937;
+            --card-bg: #374151;
+            --accent-color: #6366f1;
+            --shadow-color: rgba(99, 102, 241, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', '微軟正黑體', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 100px 0 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .floating-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .circle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .slogan {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .section {
+            padding: 80px 0;
+            background-color: var(--bg-color);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px var(--shadow-color);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .slogan {
+                font-size: 1.2rem;
+            }
+
+            .section {
+                padding: 40px 0;
+            }
+        }
+
+        .google-form {
+            width: 100%;
+            height: 800px;
+            border: none;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .benefits-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            margin-top: 10px;
+            color: var(--text-color);
+        }
+
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <header>
+        <div class="floating-circles"></div>
+        <div class="header-content container">
+            <h1>1小時圖書館鎖定</h1>
+            <p class="slogan">暫停螢幕power，拎返你個hour</p>
+            <a href="#signup" class="cta-button">立即報名</a>
+        </div>
+    </header>
+
+    <section class="section" id="about">
+        <div class="container">
+            <div class="card" data-aos="fade-up">
+                <h2>活動簡介</h2>
+                <p>透過「集體專注」營造沉浸式的學習環境，擺脫電子設備和網絡的誘惑，全心投入學習，提升學習效率！</p>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">700+</div>
+                        <div class="stat-label">參與學生</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">80%</div>
+                        <div class="stat-label">完成率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1小時</div>
+                        <div class="stat-label">專注時間</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid">
+                <div class="feature-card card" data-aos="fade-up">
+                    <i class="fas fa-clock feature-icon"></i>
+                    <h3>活動時間</h3>
+                    <p>2025年2月3日至5月10日</p>
+                </div>
+                <div class="feature-card card" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-users feature-icon"></i>
+                    <h3>參與對象</h3>
+                    <p>全校學生（約700人）</p>
+                </div>
+                <div class="feature-card card" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-trophy feature-icon"></i>
+                    <h3>獎勵機制</h3>
+                    <p>完成率達80%可獲小獎品</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="card" data-aos="fade-up">
+                <h2>活動流程</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>Step 1: 報名登記</h3>
+                        <p>通過Google Form或班級報名表登記參與</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Step 2: 收繳電話</h3>
+                        <p>活動開始前1小時收繳電話</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Step 3: 設定目標</h3>
+                        <p>填寫目標卡，訂立學習目標</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Step 4: 專注學習</h3>
+                        <p>在柔和音樂伴奏下進行1小時專注學習</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Step 5: 完成獎勵</h3>
+                        <p>達成目標即可獲得積分，累積80%完成率可獲獎品</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="benefits">
+        <div class="container">
+            <div class="card" data-aos="fade-up">
+                <h2>活動特色</h2>
+                <ul class="benefits-list">
+                    <li>集體專注氛圍，互相激勵</li>
+                    <li>遠離電子設備干擾</li>
+                    <li>柔和背景音樂，提升專注力</li>
+                    <li>目標設定與追蹤</li>
+                    <li>獎勵機制鼓勵持續參與</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="signup">
+        <div class="container">
+            <div class="card" data-aos="fade-up">
+                <h2>立即報名</h2>
+                <iframe class="google-form" src="YOUR_GOOGLE_FORM_URL_HERE"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 1小時圖書館鎖定 | 暫停螢幕power，拎返你個hour</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // 初始化AOS動畫
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+
+        // 生成浮動圓圈
+        const createCircles = () => {
+            const floatingCircles = document.querySelector('.floating-circles');
+            for (let i = 0; i < 20; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('circle');
+                circle.style.width = Math.random() * 50 + 20 + 'px';
+                circle.style.height = circle.style.width;
+                circle.style.left = Math.random() * 100 + '%';
+                circle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                circle.style.animationDelay = (Math.random() * 5) + 's';
+                floatingCircles.appendChild(circle);
+            }
+        };
+
+        // 主題切換功能
+        const toggleTheme = () => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        };
+
+        // 頁面加載完成後執行
+        document.addEventListener('DOMContentLoaded', () => {
+            createCircles();
+            
+            // 檢查系統預設主題
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+            }
+        });
+    </script>
+</body>
+</html>
